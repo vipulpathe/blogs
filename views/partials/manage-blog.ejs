@@ -1,0 +1,70 @@
+<%- include("header.ejs") %>
+<div class="container my-4">
+    <h1>Manage Your Blogs</h1>
+    <p>Here you can view, edit, and delete your blogs.</p>
+
+    <% if(locals.blogs && locals.blogs.length > 0) { %>
+        <div class="list-group">
+            <% locals.blogs.forEach(blog => { %>
+                <div class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5><%= blog.title %></h5>
+                        <p class="mb-1"><%= blog.content.substring(0, 100) %><% if(blog.content.length>100){%>...<% } %></p>
+                    </div>
+                    <div>
+                        <a href="/blogs/<%= blog._id %>" class="btn btn-primary btn-sm">View</a>
+                        <a href="/blogs/<%= blog._id %>/edit" class="btn btn-secondary btn-sm">Edit</a>
+                        <form data-blog-id="<%= blog._id %>" class="delete-blog-form d-inline">
+                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                        </form>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    <% } else { %>
+        <p>You have not created any blogs yet. <a href="/create">Create your first blog now!</a></p>
+    <% } %>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.delete-blog-form').forEach(form => {
+            form.addEventListener('submit', async event => {
+                event.preventDefault();
+                const blogId = form.dataset.blogId;
+                if (!blogId) {
+                    return;
+                }
+
+                const confirmed = window.confirm('Are you sure you want to delete this blog?');
+                if (!confirmed) {
+                    return;
+                }
+
+                const response = await fetch(`/blogs/${blogId}/delete`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    const error = await response.json().catch(() => ({}));
+                    alert('Failed to delete blog. ' + (error.error || response.statusText));
+                    return;
+                }
+
+                const item = form.closest('.list-group-item');
+                if (item) {
+                    item.remove();
+                }
+
+                const remainingItems = document.querySelectorAll('.list-group-item');
+                if (remainingItems.length === 0) {
+                    const container = document.querySelector('.container');
+                    container.innerHTML = '<h1>Manage Your Blogs</h1><p>Here you can view, edit, and delete your blogs.</p><p>You have not created any blogs yet. <a href="/create">Create your first blog now!</a></p>';
+                }
+            });
+        });
+    });
+</script>
+<%- include("footer.ejs") %>

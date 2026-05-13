@@ -1,0 +1,16 @@
+<%- include("header.ejs") %>
+<div class="container my-4">
+    <h1>Create a New Blog</h1>
+    <form action="/blogs/create" method="POST">
+        <div class="mb-3">
+            <label for="title" class="form-label">Blog Title</label>
+            <input type="text" class="form-control" id="title" name="title" required>
+        </div>
+        <div class="mb-3">
+            <label for="content" class="form-label">Blog Content</label>
+            <textarea class="form-control" id="content" name="content" rows="5" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Create Blog</button>
+    </form>
+</div>
+<%- include("footer.ejs") %>
